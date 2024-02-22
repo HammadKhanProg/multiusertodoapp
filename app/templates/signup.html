@@ -1,0 +1,16 @@
+{% extends "base.html" %}
+
+{% block content %}
+<body>
+  <div class="col-lg-4 mx-auto shadow mt-4 p-0">
+      <div class="p-4">
+          <div class="alert alert-success">Signup here</div>
+          <form action="" method="POST">
+              {% csrf_token %}
+              <div>{{form.as_p}}</div>
+              <input class="btn btn-success" type="submit" value="Signup">
+              <a href="{% url 'signin' %}">Signin To Account</a>
+          </form>
+      </div>
+  </div>
+{% endblock  %}

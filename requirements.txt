@@ -1,0 +1,24 @@
+asgiref==3.7.2
+cx-Freeze @ file:///C:/Users/Hammad/Downloads/cx_Freeze-6.11.1-cp311-cp311-win_amd64.whl#sha256=217a0b9190994bd61075b6c5a93afe9788d3676435197706ed83de9a885a1852
+distlib==0.3.7
+dj-database-url==2.1.0
+Django==4.2.6
+django-autoslug==1.9.9
+django-heroku==0.3.1
+django-tinymce==3.6.1
+djangorestframework==3.14.0
+filelock==3.12.4
+gunicorn==21.2.0
+mysql-connector-python==8.1.0
+mysqlclient==2.2.4
+packaging==23.1
+Pillow==10.0.0
+platformdirs==3.11.0
+protobuf==4.21.12
+psycopg2==2.9.9
+pytz==2024.1
+sqlparse==0.4.4
+typing_extensions==4.9.0
+tzdata==2023.3
+virtualenv==20.24.5
+whitenoise==6.6.0

@@ -1,0 +1,38 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="row mt-3">
+    <div class="col-lg-4 p-4">
+        <form action="{% url 'add_todo' %}" method="POST">
+            {% csrf_token %}
+            {{form.as_p}}
+            <input class="btn btn-success" type="submit" value="Add Todo">
+        </form>
+    </div>
+    <div class="col-lg-7 mx-auto">
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>Title</th>
+                    <th>User</th>
+                    <th>Update Todo</th>
+                    <th>Delete Todo</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for task in tasks %}
+                    <tr>
+                        <td>{{task.title}}</td>
+                        <td>{{task.user}}</td>
+                        <td><a class="btn btn-success" href='/update/{{task.id}}'>Update</a></td>
+                        <td><a class="btn btn-danger" href="/delete/{{task.id}}">Delete</a></td>
+                    </tr>
+    
+                {% endfor %}
+                
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock  %}
+    
