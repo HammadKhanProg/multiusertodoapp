@@ -1,1 +1,1 @@
-web gunicorn MU.wsgi:application --log-file -
+web: gunicorn MU.wsgi
