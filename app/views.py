@@ -7,7 +7,7 @@ from .forms import todoform
 
 from rest_framework.response import Response
 from .serializer import todoserializer
-
+from django.core.paginator import Paginator
 # user Authentication and authorization
 def signup (request):
     if request.method=="GET":
@@ -60,16 +60,30 @@ def signout (request):
 
 @login_required(login_url="signin")        
 def home (request):
-    if request.user.is_authenticated:
-        user=request.user
-        tasks=Todo.objects.filter(user=user)
-        form=todoform()
-        data={
-            "form":form,
-            "tasks":tasks
-            }
-        return render (request,"home.html",data)
-
+    if request.method=="GET":
+        if request.user.is_authenticated:
+            user=request.user
+            tasks=Todo.objects.filter(user=user)
+            paginator=Paginator(tasks,3)
+            page_no=request.GET.get("page")
+            tastfinal=paginator.get_page(page_no)
+            form=todoform()
+            data={
+                "form":form,
+                "tasks":tastfinal
+                }
+            return render (request,"home.html",data)
+    else:
+        if request.user.is_authenticated:
+            user=request.user
+            st=request.POST.get("ui")
+            tasks=Todo.objects.filter(user=user,title__icontains=st)
+            form=todoform()
+            data={
+                "form":form,
+                "tasks":tasks
+                }
+            return render (request,"home.html",data)
 def add_todo (request):
     if request.user.is_authenticated:
         user=request.user
@@ -86,11 +100,19 @@ def add_todo (request):
         else:
             return render (request,"home.html",data)   
 def update (request,pk):
-    task=Todo.objects.get(id=pk)
-    form = todoform(instance=task)
-    data={
-        "form":form
-    }
+    if request.method=="GET":
+        task=Todo.objects.get(id=pk)
+        form = todoform(instance=task)
+        data={
+            "form":form
+        }
+        return render(request,"update.html",data)
+    else:
+        task=Todo.objects.get(id=pk)
+        form = todoform(request.POST,instance=task)
+        if form.is_valid():
+            form.save()
+            return redirect("home")
     return render(request,"update.html",data)
 def delete (request,pk):
     task=Todo.objects.get(id=pk)
@@ -115,9 +137,9 @@ class writebyadminonly (BasePermission):
         return False
 
 class todolist (generics.ListCreateAPIView):
-    authentication_classes=[TokenAuthentication]
+    authentication_classes=[BasicAuthentication]
     permission_classes=[IsAuthenticated]
-    queryset=Todo.objects.all()
+    queryset=Todo.objects.all() 
     serializer_class=todoserializer
 
 class tododetaillist (generics.RetrieveUpdateDestroyAPIView):
