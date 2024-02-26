@@ -9,6 +9,7 @@ from rest_framework.response import Response
 from .serializer import todoserializer
 from django.core.paginator import Paginator
 # user Authentication and authorization
+
 def signup (request):
     if request.method=="GET":
         form=UserCreationForm()
@@ -119,33 +120,62 @@ def delete (request,pk):
     task.delete()
     return redirect ("home")
 
+def admin (request):
+    if request.user.is_authenticated:
+        user=request.user
+        if user.is_superuser:
+            users=User.objects.all()
+            data={
+                "users":users
+            }
+            return render(request,'adminpanel.html',data)
+        else:
+            redirect ('home')
+
+
+
 
 # Rest api area
 from rest_framework.views import APIView
-from rest_framework import generics
+from rest_framework import generics,permissions
 from rest_framework.authentication import BasicAuthentication,TokenAuthentication
-from rest_framework.permissions import IsAuthenticated,BasePermission
+from rest_framework.permissions import IsAuthenticated,BasePermission,IsAdminUser
+from django.contrib.auth.models import User
+from .serializer import userserializer
 
-class writebyadminonly (BasePermission):
+class writebyuseronly (BasePermission):
     def has_permission(self, request, view):
         user=request.user
         if request.method=="GET":
             return True
-        if request.method=="POST" or request.method=="PUT" or request.method=="DELETE":
+        if request.method=="RETRIEVE" or request.method=="PUT" or request.method=="DELETE":
             if user.is_superuser:
                 return True
         return False
 
 class todolist (generics.ListCreateAPIView):
-    authentication_classes=[BasicAuthentication]
-    permission_classes=[IsAuthenticated]
-    queryset=Todo.objects.all() 
     serializer_class=todoserializer
+    permission_classes=[IsAuthenticated]
+
+    def get_queryset(self):
+        return Todo.objects.filter(user=self.request.user)
+
+    def perform_create(self, serializer):
+        serializer.save(user=self.request.user)
 
 class tododetaillist (generics.RetrieveUpdateDestroyAPIView):
     queryset=Todo.objects.all()
     serializer_class=todoserializer
+    permission_classes = [IsAdminUser,IsAuthenticated,writebyuseronly]
 
+
+class users_signup (generics.ListCreateAPIView):
+    queryset=User.objects.all()
+    serializer_class=userserializer
+
+class users_detail_signup (generics.RetrieveUpdateDestroyAPIView):
+    queryset=User.objects.all()
+    serializer_class=userserializer
 
 
     
